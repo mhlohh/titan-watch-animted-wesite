@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 
 const FRAME_COUNT = 300;
@@ -7,7 +7,6 @@ export default function ScrollSequenceHero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>(new Array(FRAME_COUNT));
-  const [isLoaded, setIsLoaded] = useState(false);
   
   // Create framer-motion scroll listener on the container
   const { scrollYProgress } = useScroll({
@@ -31,7 +30,6 @@ export default function ScrollSequenceHero() {
         
         // Render first frame immediately to prevent blank screen
         if (i === 1) {
-          setIsLoaded(true);
           renderFrame(1);
         }
       };
