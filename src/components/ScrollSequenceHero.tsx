@@ -6,7 +6,8 @@ const FRAME_COUNT = 300;
 export default function ScrollSequenceHero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [images, setImages] = useState<HTMLImageElement[]>([]);
+  const imagesRef = useRef<HTMLImageElement[]>(new Array(FRAME_COUNT));
+  const [isLoaded, setIsLoaded] = useState(false);
   
   // Create framer-motion scroll listener on the container
   const { scrollYProgress } = useScroll({
@@ -16,7 +17,6 @@ export default function ScrollSequenceHero() {
 
   // Preload images on mount
   useEffect(() => {
-    const loadedImages: HTMLImageElement[] = [];
     let loadedCount = 0;
 
     for (let i = 1; i <= FRAME_COUNT; i++) {
@@ -24,26 +24,29 @@ export default function ScrollSequenceHero() {
       // Format number to 3 digits (e.g., 001, 045, 300)
       const frameNumber = i.toString().padStart(3, '0');
       img.src = `/images/herosection/ezgif-frame-${frameNumber}.png`;
+      
       img.onload = () => {
+        imagesRef.current[i - 1] = img;
         loadedCount++;
-        if (loadedCount === FRAME_COUNT) {
-          setImages(loadedImages);
-          renderFrame(1, loadedImages);
+        
+        // Render first frame immediately to prevent blank screen
+        if (i === 1) {
+          setIsLoaded(true);
+          renderFrame(1);
         }
       };
-      loadedImages.push(img);
     }
   }, []);
 
   // Function to render a specific frame to the canvas
-  const renderFrame = (frameIndex: number, imgArray: HTMLImageElement[]) => {
-    if (!canvasRef.current || imgArray.length === 0) return;
+  const renderFrame = (frameIndex: number) => {
+    if (!canvasRef.current) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const img = imgArray[frameIndex - 1];
+    const img = imagesRef.current[frameIndex - 1];
     if (!img || !img.complete) return;
 
     // Set canvas dimensions to match window or image aspect ratio
@@ -67,10 +70,15 @@ export default function ScrollSequenceHero() {
 
   // Map scroll progress (0 to 1) to frame index (1 to 300)
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (images.length === FRAME_COUNT) {
-      const frameIndex = Math.max(1, Math.min(FRAME_COUNT, Math.ceil(latest * FRAME_COUNT)));
-      requestAnimationFrame(() => renderFrame(frameIndex, images));
+    const targetFrame = Math.max(1, Math.min(FRAME_COUNT, Math.ceil(latest * FRAME_COUNT)));
+    
+    // Find the closest loaded frame if the target isn't loaded yet
+    let bestFrame = targetFrame;
+    while (bestFrame > 1 && (!imagesRef.current[bestFrame - 1] || !imagesRef.current[bestFrame - 1].complete)) {
+      bestFrame--;
     }
+    
+    requestAnimationFrame(() => renderFrame(bestFrame));
   });
 
   // Typography animation triggers based on scroll percentage
