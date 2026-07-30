@@ -1,5 +1,4 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { ShieldCheck, CheckCircle2, ChevronRight, Award } from 'lucide-react';
 import ScrollSequenceHero from './components/ScrollSequenceHero';
 
@@ -113,12 +112,12 @@ function App() {
 // Sub-components
 
 function FeatureBlock({ subtitle, title, description, features, align, imageUrl }: { subtitle: string, title: string, description: string, features: string[], align: 'left' | 'right', imageUrl?: string }) {
-  const textVariants = {
+  const textVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeOut" } }
   };
 
-  const imageVariants = {
+  const imageVariants: Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1, transition: { duration: 1.5, ease: "easeOut" } }
   };
@@ -175,7 +174,7 @@ function FeatureBlock({ subtitle, title, description, features, align, imageUrl 
 }
 
 function SpecsSection() {
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -185,7 +184,7 @@ function SpecsSection() {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
   };
